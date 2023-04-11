@@ -1,0 +1,14 @@
+FOR individuals, and small business owners
+
+WHO need a way to ensure sensitive information is not mistakenly sent via email and do not
+have the budget for an in-house security team
+
+THE SafeSend software is a Gmail plugin
+
+THAT scans emails for sensitive information like credit card numbers, social security numbers, and other keywords and uses machine learning to redact this information and notify the sender
+
+UNLIKE in-house security teams or more general Gmail plugins
+
+OUR PRODUCT provides real-time, efficient scanning and customizable settings to ensure
+sensitive information is not accidentally sent via email, giving users and managers peace of
+mind that employees are not mistakenly endangering customer info
