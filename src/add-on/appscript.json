@@ -14,8 +14,8 @@
   "runtimeVersion": "V8",
   "addOns": {
     "common": {
-      "name": "Cats",
-      "logoUrl": "https://www.gstatic.com/images/icons/material/system/1x/pets_black_48dp.png",
+      "name": "SafeSend",
+      "logoUrl": "https://raw.githubusercontent.com/impaulb/safesend/main/docs/logo/safesend_logo_nobg.png",
       "useLocaleFromApp": true,
       "homepageTrigger": {
         "runFunction": "onHomepage",
