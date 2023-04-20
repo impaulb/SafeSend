@@ -13,6 +13,7 @@ _street_address   = re.compile('\d{1,4} [\w\s]{1,20}(?:street|st|avenue|ave|road
 _zip_code         = re.compile(r'\b\d{5}(?:[-\s]\d{4})?\b')
 _po_box           = re.compile(r'P\.? ?O\.? Box \d+', re.IGNORECASE)
 _ssn              = re.compile('(?!000|666|333)0*(?:[0-6][0-9][0-9]|[0-7][0-6][0-9]|[0-7][0-7][0-2])[- ](?!00)[0-9]{2}[- ](?!0000)[0-9]{4}')
+_mac_address      = re.compile(r'(?:[a-fA-F0-9]{2}-){5}[a-fA-F0-9]{2}|(?:[a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}|(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}')
 
 def detect(data):
     """
@@ -34,6 +35,7 @@ def detect(data):
         'zip_code': _zip_code.findall(data),
         'po_box': _po_box.findall(data),
         'ssn': _ssn.findall(data)
+        'mac_address': _ssn.findall(data)
     }
 
 def redact(data, target=[]):
