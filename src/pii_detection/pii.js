@@ -1,36 +1,34 @@
-_ssn = new RegExp(/(?!000|666|333)0*(?:[0-6][0-9][0-9]|[0-7][0-6][0-9]|[0-7][0-7][0-2])[- ](?!00)[0-9]{2}[- ](?!0000)[0-9]{4}/);
-// _phone = new RegExp()
-// _phones_with_exts = new RegExp();
-// _link = new RegExp();
-// _email = new RegExp();
-// _ip = new RegExp();
-// _ipv6 = new RegExp();
-// _credit_card = new RegExp();
-// _btc_address = new RegExp();
-// _street_address = new RegExp();
-// _zip_code = new RegExp();
-// _po_box = new RegExp();
+_ssn = new RegExp(/^(?!000|666|333)0*(?:[0-6][0-9][0-9]|[0-7][0-6][0-9]|[0-7][0-7][0-2])[- ](?!00)[0-9]{2}[- ](?!0000)[0-9]{4}/);
+_phone = new RegExp(/^(?:\+?(\d{1,3}))?([-.(]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)/gm)
+_link = new RegExp(/^[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi);
+_email = new RegExp(/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g);
+_ip = new RegExp(/^(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b/ig);
+_credit_card = new RegExp(/^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})/);
+_btc_address = new RegExp(/^([13][a-km-zA-HJ-NP-Z0-9]{26,33})/g);
 
 function detect(data) {
     /*
      * Detects personally identifiable information (PII) types in the input 'data' using regular expressions.
      *
-     * Returns a dictionary with PII types as keys and corresponding snippets as values.
+     * Returns a string of the PII type or null if not PII.
      */
-    return {
-    //   'phone': data.match(_phone),
-    //   'phones_with_exts': data.match(_phones_with_exts),
-    //   'link': data.match(_link),
-    //   'email': data.match(_email),
-    //   'ip': data.match(_ip),
-    //   'ipv6': data.match(_ipv6),
-    //   'credit_card': data.match(_credit_card),
-    //   'btc_address': data.match(_btc_address),
-    //   'street_address': data.match(_street_address),
-    //   'zip_code': data.match(_zip_code),
-    //   'po_box': data.match(_po_box),
-      'ssn': data.match(_ssn)
-    };
+
+    if(data.match(_phone) != null)
+      return "phone";
+    else if(data.match(_link) != null)
+      return "link";
+    else if(data.match(_email) != null)
+      return "email";
+    else if(data.match(_ip) != null)
+      return "ip";
+    else if(data.match(_credit_card) != null)
+      return "credit_card";
+    else if(data.match(_btc_address) != null)
+      return "btc_address";
+    else if(data.match(_ssn) != null)
+      return "ssn";
+    else
+      return null;
   }
   
   function redact(data, target = []) {
@@ -39,28 +37,22 @@ function detect(data) {
      *
      * @param data (str): Input data to be redacted.
      * @param target (list, optional): List of PII types to be redacted. Defaults to an empty list which redacts all detected PII.
-     *                                 Options: phone, phones_with_exts, link, email, ip, ipv6, credit_card, btc_address, zip_code, po_box, ssn
+     *                                 Options: phone, link, email, ip, credit_card, btc_address, ssn
      *
      * Returns:
      * str: The redacted 'data' with PII snippets replaced by '[REDACTED]'.
      */
-  
-    const detected = detect(data);
-  
-    for (const pii_type in detected) {
-      if (target.length != 0 && !target.includes(pii_type)) {
-        continue;
-      }
-  
-      const pii_data = detected[pii_type];
-  
-      for (const pii_snippet of pii_data) {
-        data = data.replace(pii_snippet, '[REDACTED]');
-      }
-    }
-  
+
+    const split_data = data.split(' ');
+
+    let pii_summary = {};
+
+    for (const token of split_data)
+      if((type = detect(token)) != null)
+        pii_summary[token] = type;
+
+    for (const pii_snippet in pii_summary)
+      data = data.replace(pii_snippet, '[REDACTED]');
+
     return data;
   }
-
-let test = redact("My phone number is 387 38 3749");
-console.log(test);
