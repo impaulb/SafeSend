@@ -14,6 +14,9 @@ function detect(data) {
     if(data.match(_phone) != null)
       possible_matches.push("PHONE");
     
+    if(possible_matches.length === 0)
+      return null;
+
     return possible_matches;
   }
 
