@@ -1,92 +1,114 @@
 /**
- * Callback for rendering the card for a specific Gmail message.
- * @param {Object} e The event object.
- * @return {CardService.Card} The card to show to the user.
- */
-function onGmailMessage(e) {
-  console.log(e);
-  // Get the ID of the message the user has open.
-  var messageId = e.gmail.messageId;
-
-  // Get an access token scoped to the current message and use it for GmailApp
-  // calls.
-  var accessToken = e.gmail.accessToken;
-  GmailApp.setCurrentMessageAccessToken(accessToken);
-
-  // Get the subject of the email.
-  var message = GmailApp.getMessageById(messageId);
-  var subject = message.getThread().getFirstMessageSubject();
-
-  // Remove labels and prefixes.
-  subject = subject
-      .replace(/^([rR][eE]|[fF][wW][dD])\:\s*/, '')
-      .replace(/^\[.*?\]\s*/, '');
-
-  // If neccessary, truncate the subject to fit in the image.
-  subject = truncate(subject);
-
-  return createCatCard(subject);
-}
-
-/**
  * Callback for rendering the card for the compose action dialog.
  * @param {Object} e The event object.
  * @return {CardService.Card} The card to show to the user.
  */
 function onGmailCompose(e) {
-  console.log(e);
-  var header = CardService.newCardHeader()
-      .setTitle('Insert cat')
-      .setSubtitle('Add a custom cat image to your email message.');
-  // Create text input for entering the cat's message.
-  var input = CardService.newTextInput()
-      .setFieldName('text')
-      .setTitle('Caption')
-      .setHint('What do you want the cat to say?');
-  // Create a button that inserts the cat image when pressed.
-  var action = CardService.newAction()
-      .setFunctionName('onGmailInsertCat');
-  var button = CardService.newTextButton()
-      .setText('Insert cat')
-      .setOnClickAction(action)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
-  var buttonSet = CardService.newButtonSet()
-      .addButton(button);
-  // Assemble the widgets and return the card.
-  var section = CardService.newCardSection()
-      .addWidget(input)
-      .addWidget(buttonSet);
-  var card = CardService.newCardBuilder()
-      .setHeader(header)
-      .addSection(section);
-  return card.build();
-}
-
-/**
- * Callback for inserting a cat into the Gmail draft.
- * @param {Object} e The event object.
- * @return {CardService.UpdateDraftActionResponse} The draft update response.
- */
-function onGmailInsertCat(e) {
-  console.log(e);
-  // Get the text that was entered by the user.
-  var text = e.formInput.text;
-  // Use the "Cat as a service" API to get the cat image. Add a "time" URL
-  // parameter to act as a cache buster.
-  var now = new Date();
-  var imageUrl = 'https://cataas.com/cat';
-  if (text) {
-    // Replace forward slashes in the text, as they break the CataaS API.
-    var caption = text.replace(/\//g, ' ');
-    imageUrl += Utilities.formatString('/says/%s?time=%s',
-        encodeURIComponent(caption), now.getTime());
+    var header = CardService.newCardHeader()
+        .setTitle('Redact email')
+        .setSubtitle('Press the button to find all sensitive information in your email text.');
+  
+    var input = CardService.newTextInput()
+        .setFieldName('text')
+        .setTitle('Email Text')
+        .setHint('Please paste your email content.');
+  
+    var selector = CardService.newSelectionInput()
+        .setType(CardService.SelectionInputType.CHECK_BOX)
+        .setTitle("Select which PII you want to search for:")
+        .setFieldName("checkbox_field")
+  
+    var supportedPii = getSupportedTypes();
+    const userProperties = PropertiesService.getUserProperties();
+    var userRedactionCounts = {};
+    var redactionCountText = "Total redaction counter:\n";
+  
+    for (i in supportedPii){
+      selector.addItem(supportedPii[i], supportedPii[i]+"_value", false);
+      userRedactionCounts[supportedPii[i]] = userProperties.getProperty(supportedPii[i]);
+      
+      // Never redacted before
+      if(userRedactionCounts[supportedPii[i]] === null)
+        userRedactionCounts[supportedPii[i]] = 0;
+    }
+  
+    for (const [type, count] of Object.entries(userRedactionCounts)){
+      redactionCountText += type + ": " + parseInt(count) + "\n";
+    }
+  
+    // Create a button that redacts all sensitive information from email text
+    var action = CardService.newAction()
+        .setFunctionName('onGmailRedactAll');
+    var button = CardService.newTextButton()
+        .setText('Find PII')
+        .setOnClickAction(action)
+        .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+    var buttonSet = CardService.newButtonSet()
+        .addButton(button)
+  
+    var textParagraph = CardService.newTextParagraph()
+      .setText(redactionCountText);
+  
+    // Assemble the widgets and return the card.
+    var section = CardService.newCardSection()
+        .addWidget(input)
+        .addWidget(selector)
+        .addWidget(buttonSet)
+        .addWidget(textParagraph);
+  
+    var card = CardService.newCardBuilder()
+        .setHeader(header)
+        .addSection(section)
+  
+    return card.build();
   }
-  var imageHtmlContent = '<img style="display: block; max-height: 300px;" src="'
-      + imageUrl + '"/>';
-  var response = CardService.newUpdateDraftActionResponseBuilder()
-      .setUpdateDraftBodyAction(CardService.newUpdateDraftBodyAction()
-          .addUpdateContent(imageHtmlContent,CardService.ContentType.MUTABLE_HTML)
-          .setUpdateType(CardService.UpdateDraftBodyType.IN_PLACE_INSERT))
-      .build();
-  return response;
-}
+  
+  /**
+   * Callback for redacting an email text.
+   * @param {Object} e The event object.
+   * @return {CardService.UpdateDraftActionResponse} The draft update response.
+   */
+  function onGmailRedactAll(e) {
+    // Load saved user properties
+    const userProperties = PropertiesService.getUserProperties();
+  
+    // Get the redaction summary from the text of the email
+    var redactedSummaryDict = redact(e.formInput.text);
+  
+    // Get user redaction counts for each redacted property
+    var userRedactionCounts = {};
+  
+    for (const [pii, type] of Object.entries(redactedSummaryDict)){
+      userRedactionCounts[type] = userProperties.getProperty(type);
+  
+      // Never redacted before
+      if(userRedactionCounts[type] === null)
+        userRedactionCounts[type] = 0;
+    }
+  
+    var text = "----------------------------------------------------------------------------<br>";
+  
+    if (Object.keys(redactedSummaryDict).length === 0)
+      text += "SafeSend <b>did NOT find any PII</b> in the email!<br>";
+    else {
+      text += "SafeSend <b>found the following PII</b> in the email:<ul>";
+      for (const [pii, type] of Object.entries(redactedSummaryDict)) {
+        userRedactionCounts[type]++;
+        text += "<li>" + pii + " : " + type + "</li>";
+      }
+      text += "</ul>";
+    }
+  
+    text += "----------------------------------------------------------------------------<br>";
+  
+    for (const [type, count] of Object.entries(userRedactionCounts)){
+      userProperties.setProperty(type, count);
+    }
+  
+    var response = CardService.newUpdateDraftActionResponseBuilder()
+        .setUpdateDraftBodyAction(CardService.newUpdateDraftBodyAction()
+            .addUpdateContent(text,CardService.ContentType.MUTABLE_HTML)
+            .setUpdateType(CardService.UpdateDraftBodyType.INSERT_AT_START))
+        .build();
+    return response;
+  }
