@@ -1,4 +1,5 @@
-_ssn = new RegExp(/^(?!000|666|333)0*(?:[0-6][0-9][0-9]|[0-7][0-6][0-9]|[0-7][0-7][0-2])[- ](?!00)[0-9]{2}[- ](?!0000)[0-9]{4}/);
+_ssn = new RegExp(/([0-9]{9})|([0-9]{3}[-,\s][0-9]{6})|([0-9]{5}[-,\s][0-9]{4})|([0-9]{3}[-,\s][0-9]{2}[-,\s][0-9]{4})|([0-9]{2}[-,\s][0-9]{7})/);
+_phone = new RegExp(/(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})/);
 
 function detect(data) {
     /*
@@ -7,10 +8,13 @@ function detect(data) {
      * Returns a string of the PII type or null if not PII.
      */
 
+  var possible_matches = [];
     if(data.match(_ssn) != null)
-      return "SSN";
-    else
-      return null;
+      possible_matches.push("SSN");
+    if(data.match(_phone) != null)
+      possible_matches.push("PHONE");
+    
+    return possible_matches;
   }
 
   function getSupportedTypes(){
@@ -34,8 +38,69 @@ function detect(data) {
     let pii_summary = {};
 
     for (const token of split_data)
-      if((type = detect(token)) != null)
-        pii_summary[token] = type;
+      if((types = detect(token)) != null)
+        pii_summary[token] = types;
 
     return pii_summary;
   }
+
+// Google Scripts do not work well with automatic
+// unit testing. As a result, we had to implement
+// unit tests as a simple function. Ugly? Yes.
+// But it gets the job done.
+function run_test_suite() {
+  var valid_ssn = [
+    "123-45-6789",
+    "544-45-6789",
+    "001815293",
+    "159-12-9273",
+    "252-65-1954",
+    "429-89-5729",
+    "575 42 8931",
+    "575 42-8931",
+    "575-42 8931",
+    "575 428931",
+    "57542-8931"
+  ]
+
+  var valid_phone = [
+    "555-555-5555",
+    "(555) 555 5555",
+    "(555)5555555",
+    "(555)5555555",
+    "555 555 5555",
+    "555 555-5555",
+    "555-555 5555",
+    "(555)-555-5555",
+  ]
+
+  console.log("<---- EXECUTING: SSN TEST ---->");
+
+  for(ssn of valid_ssn){
+      var response = detect(ssn);
+
+      if(response != 'SSN'){
+          console.log("ERROR: " + ssn);
+          console.log("\tEXPECT:\tSSN");
+          console.log("\tACTUAL:\t" + response);
+      }
+  }
+
+  console.log("<---- COMPLETED: SSN TEST ---->\n");
+
+  console.log("<---- EXECUTING: PHONE TEST ---->");
+
+  for(phone of valid_phone){
+      var response = detect(phone);
+
+      if(response != 'PHONE'){
+          console.log("ERROR: " + phone);
+          console.log("\tEXPECT:\PHONE");
+          console.log("\tACTUAL:\t" + response);
+      }
+  }
+
+  console.log("<---- COMPLETED: PHONE TEST ---->");
+}
+
+run_test_suite();
