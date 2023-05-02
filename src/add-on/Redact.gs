@@ -1,5 +1,6 @@
 _ssn = new RegExp(/([0-9]{9})|([0-9]{3}[-,\s][0-9]{6})|([0-9]{5}[-,\s][0-9]{4})|([0-9]{3}[-,\s][0-9]{2}[-,\s][0-9]{4})|([0-9]{2}[-,\s][0-9]{7})/);
 _phone = new RegExp(/(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})/);
+_email = new RegExp(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
 
 function detect(data) {
     /*
@@ -13,6 +14,8 @@ function detect(data) {
       possible_matches.push("SSN");
     if(data.match(_phone) != null)
       possible_matches.push("PHONE");
+    if(data.match(_email) != null)
+      possible_matches.push("EMAIL");
     
     if(possible_matches.length === 0)
       return null;
@@ -21,7 +24,7 @@ function detect(data) {
   }
 
   function getSupportedTypes(){
-    return ['SSN', 'PHONE'];
+    return ['SSN', 'PHONE', 'EMAIL'];
   }
   
   function redact(data, target = []) {
@@ -77,6 +80,13 @@ function run_test_suite() {
     "(555)-555-5555",
   ]
 
+  var valid_email = [
+    "helloworld@gmail.com",
+    "anything@outlook.com",
+    "student@scu.edu",
+    "someone@yahoo.com",
+  ]
+
   console.log("<---- EXECUTING: SSN TEST ---->");
 
   for(ssn of valid_ssn){
@@ -98,12 +108,26 @@ function run_test_suite() {
 
       if(response != 'PHONE'){
           console.log("ERROR: " + phone);
-          console.log("\tEXPECT:\PHONE");
+          console.log("\tEXPECT:\tPHONE");
           console.log("\tACTUAL:\t" + response);
       }
   }
 
-  console.log("<---- COMPLETED: PHONE TEST ---->");
+  console.log("<---- COMPLETED: PHONE TEST ---->\n");
+
+  console.log("<---- EXECUTING: EMAIL TEST ---->");
+
+  for(email of valid_email){
+      var response = detect(email);
+
+      if(response != 'EMAIL'){
+          console.log("ERROR: " + email);
+          console.log("\tEXPECT:\tEMAIL");
+          console.log("\tACTUAL:\t" + response);
+      }
+  }
+
+  console.log("<---- COMPLETED: EMAIL TEST ---->");
 }
 
 run_test_suite();
