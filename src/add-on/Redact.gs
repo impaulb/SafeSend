@@ -45,7 +45,8 @@ function detect(data) {
 
     for (const token of split_data)
       if((types = detect(token)) != null)
-        pii_summary[token] = types;
+        if(target.length === 0 || target.some(type => types.includes(type)))
+          pii_summary[token] = types.toString();
 
     return pii_summary;
   }
@@ -129,5 +130,3 @@ function run_test_suite() {
 
   console.log("<---- COMPLETED: EMAIL TEST ---->");
 }
-
-run_test_suite();
