@@ -24,7 +24,7 @@ function onGmailCompose(e) {
   var redactionCountText = "Total redaction counter:\n";
 
   for (i in supportedPii){
-    selector.addItem(supportedPii[i], supportedPii[i]+"_value", false);
+    selector.addItem(supportedPii[i], supportedPii[i], false);
     userRedactionCounts[supportedPii[i]] = userProperties.getProperty(supportedPii[i]);
     
     // Never redacted before
@@ -72,8 +72,11 @@ function onGmailRedactAll(e) {
   // Load saved user properties
   const userProperties = PropertiesService.getUserProperties();
 
+  // Get which PII to redact
+  var piiSelector = e.formInputs.checkbox_field;
+
   // Get the redaction summary from the text of the email
-  var redactedSummaryDict = redact(e.formInput.text);
+  var redactedSummaryDict = redact(e.formInput.text, piiSelector);
 
   // Get user redaction counts for each redacted property
   var userRedactionCounts = {};
