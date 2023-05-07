@@ -33,10 +33,10 @@ function detect(data) {
      *
      * @param data (str): Input data to be redacted.
      * @param target (list, optional): List of PII types to be redacted. Defaults to an empty list which redacts all detected PII.
-     *                                 Options: phone, link, email, ip, credit_card, btc_address, ssn
+     *                                 Options are provided through the function getSupportedTypes()
      *
      * Returns:
-     * str: The redacted 'data' with PII snippets replaced by '[REDACTED]'.
+     * dict: Key: token that was matches, Value: array of possible PII types that matched
      */
 
     const split_data = data.split(' ');
@@ -51,82 +51,8 @@ function detect(data) {
     return pii_summary;
   }
 
-// Google Scripts do not work well with automatic
-// unit testing. As a result, we had to implement
-// unit tests as a simple function. Ugly? Yes.
-// But it gets the job done.
-function run_test_suite() {
-  var valid_ssn = [
-    "123-45-6789",
-    "544-45-6789",
-    "001815293",
-    "159-12-9273",
-    "252-65-1954",
-    "429-89-5729",
-    "575 42 8931",
-    "575 42-8931",
-    "575-42 8931",
-    "575 428931",
-    "57542-8931"
-  ]
-
-  var valid_phone = [
-    "555-555-5555",
-    "(555) 555 5555",
-    "(555)5555555",
-    "(555)5555555",
-    "555 555 5555",
-    "555 555-5555",
-    "555-555 5555",
-    "(555)-555-5555",
-  ]
-
-  var valid_email = [
-    "helloworld@gmail.com",
-    "anything@outlook.com",
-    "student@scu.edu",
-    "someone@yahoo.com",
-  ]
-
-  console.log("<---- EXECUTING: SSN TEST ---->");
-
-  for(ssn of valid_ssn){
-      var response = detect(ssn);
-
-      if(response != 'SSN'){
-          console.log("ERROR: " + ssn);
-          console.log("\tEXPECT:\tSSN");
-          console.log("\tACTUAL:\t" + response);
-      }
-  }
-
-  console.log("<---- COMPLETED: SSN TEST ---->\n");
-
-  console.log("<---- EXECUTING: PHONE TEST ---->");
-
-  for(phone of valid_phone){
-      var response = detect(phone);
-
-      if(response != 'PHONE'){
-          console.log("ERROR: " + phone);
-          console.log("\tEXPECT:\tPHONE");
-          console.log("\tACTUAL:\t" + response);
-      }
-  }
-
-  console.log("<---- COMPLETED: PHONE TEST ---->\n");
-
-  console.log("<---- EXECUTING: EMAIL TEST ---->");
-
-  for(email of valid_email){
-      var response = detect(email);
-
-      if(response != 'EMAIL'){
-          console.log("ERROR: " + email);
-          console.log("\tEXPECT:\tEMAIL");
-          console.log("\tACTUAL:\t" + response);
-      }
-  }
-
-  console.log("<---- COMPLETED: EMAIL TEST ---->");
+module.exports = {
+  detect,
+  getSupportedTypes,
+  redact,
 }
