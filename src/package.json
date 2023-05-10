@@ -2,7 +2,7 @@
   "name": "src",
   "version": "1.0.0",
   "description": "SafeSend is a powerful Gmail plugin designed to enhance email security and protect sensitive information. With SafeSend, you can confidently send emails without worrying about accidental disclosures of confidential data. This plugin provides an extra layer of protection to ensure that sensitive information, such as account numbers, investment details, or proprietary trading information, is redacted from your emails before they are sent",
-  "main": "Redact.gs",
+  "main": "Helper.gs",
   "scripts": {
     "test": "jest --coverage"
   },
