@@ -1,5 +1,5 @@
 {
-  "timeZone": "America/New_York",
+  "timeZone": "America/Los_Angeles",
   "dependencies": {
   },
   "exceptionLogging": "STACKDRIVER",
@@ -19,11 +19,11 @@
       "useLocaleFromApp": true,
       "homepageTrigger": {
         "runFunction": "onHomepage",
-        "enabled": true
+        "enabled": false
       },
       "universalActions": [{
-        "label": "Learn more about Cataas",
-        "openLink": "https://cataas.com"
+        "label": "Learn more about SafeSend",
+        "openLink": "https://github.com/impaulb/safesend"
       }]
     },
     "gmail": {
@@ -34,20 +34,10 @@
       }],
       "composeTrigger": {
         "selectActions": [{
-          "text": "Insert cat",
+          "text": "Write a SafeSend email",
           "runFunction": "onGmailCompose"
         }],
         "draftAccess": "NONE"
-      }
-    },
-    "drive": {
-      "onItemsSelectedTrigger": {
-        "runFunction": "onDriveItemsSelected"
-      }
-    },
-    "calendar": {
-      "eventOpenTrigger": {
-        "runFunction": "onCalendarEventOpen"
       }
     }
   }

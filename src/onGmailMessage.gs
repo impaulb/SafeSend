@@ -121,3 +121,4 @@ function getRedactionCount(message) {
   }
   return parseInt(count).toFixed(0);
 }
+
