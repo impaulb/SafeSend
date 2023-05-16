@@ -76,6 +76,22 @@ test("Verify valid email positive matches", () => {
     });
 });
 
+// Test: Verify that valid VINs are detected correctly.
+test("Verify valid VIN positive matches", () => {
+    const valid_vin = [
+        "4S3BK4358V7310025",
+        "JH4KA2650HC000268",
+        "1FMZK04185GA30815",
+        "3D7KU28C04G254161",
+        "WBAVB13506PT22180"
+    ];
+    const expected = ['VIN'];
+    
+    valid_vin.forEach(vin => {
+        expect(helper.getTokenTypes(vin)).toEqual(expect.arrayContaining(expected));
+    });
+});
+
 // Test: Verify that the list of supported types is up to date.
 test("Verify supported types are up to date", () => {
     const expected = ['SSN', 'PHONE', 'EMAIL'];
