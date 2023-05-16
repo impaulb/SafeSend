@@ -50,7 +50,9 @@ test("Verify valid dates positive matches", () => {
         "01.01.2002",
         "1 1 2002",
         "01 01 2002",
-        "01/01 2002"
+        "01/01 2002",
+        "1/1/02",
+        "01/01/02"
     ];
     const expected = ['DATE'];
     
