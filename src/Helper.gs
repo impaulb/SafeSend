@@ -47,14 +47,16 @@ const supportedRegex = {
     return Object.keys(supportedRegex);
   }
     
-  function redactString(data, target = []) {
+  function redactString(data, target = [], keepLastDigits = false) {
     /*
       * Redacts personally identifiable information (PII) from the input 'data'.
       *
       * @param data (str): Input data to be redacted.
       * @param target (list, optional): List of PII types to be redacted. Defaults to an empty list which redacts all detected PII.
       *                                 Options are provided through the function getSupportedTypes().
-      *
+      * @param keepLastDigits (bool, optional): Option to keep the last 4 digits of numeric PII in plaintext.
+      *                                         This is false by default.
+      * 
       * Returns:
       * str: original data string with PII replaced with a [REDACTED] substring.
       */
@@ -67,7 +69,10 @@ const supportedRegex = {
       if(isTokenPii(token)){
         var tokenTypes = getTokenTypes(token);
         if(shouldRedact(tokenTypes, target))
-            data = data.replace(token, "[REDACTED]");
+            if((tokenTypes.includes('SSN') || tokenTypes.includes('PHONE')) && keepLastDigits)
+              data = data.replace(token, 'XXX-' + token.substr(token.length - 4));
+            else
+              data = data.replace(token, '[REDACTED]');
       }
     return data;
   }
