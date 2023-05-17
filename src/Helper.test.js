@@ -93,7 +93,7 @@ test("Verify valid VIN positive matches", () => {
 });
 
 // Test: Verify that valid Passport numbers are detected correctly.
-test("Verify valid Passport number", ()=>{
+test("Verify valid Passport number", () => {
     const valid_passport = [
         "948331512",
         "850642111",
@@ -105,6 +105,9 @@ test("Verify valid Passport number", ()=>{
 
     valid_passport.forEach(passport => {
         expect(helper.getTokenTypes(passport)).toEqual(expect.arrayContaining(expected));
+    });
+});
+
       
 // Test: Verify that valid MAC addresses are detected correctly.
 test("Verify valid MAC address positive matches", () => {
