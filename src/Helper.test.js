@@ -92,6 +92,22 @@ test("Verify valid VIN positive matches", () => {
     });
 });
 
+// Test: Verify that valid Passport numbers are detected correctly.
+test("Verify valid Passport number", ()=>{
+    const valid_passport = [
+        "948331512",
+        "850642111",
+        "130125111",
+        "116794678",
+        "504918825"
+    ];
+    const expected = ['PASSPORT'];
+
+    valid_passport.forEach(passport => {
+        expect(helper.getTokenTypes(passport)).toEqual(expect.arrayContaining(expected));
+    });
+});
+
 // Test: Verify that the list of supported types is up to date.
 test("Verify supported types are up to date", () => {
     const expected = ['SSN', 'PHONE', 'EMAIL'];
