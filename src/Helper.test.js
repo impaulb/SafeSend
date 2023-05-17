@@ -99,7 +99,7 @@ test("Verify supported types are up to date", () => {
 });
 
 // Test: Verify that the Redact function returns an empty string when given an empty string.
-test("Verify redact function returns an emtpy dictionary", () => {
+test("Verify redact function returns an empty dictionary", () => {
     expect(helper.redactString("").length).toEqual(0);
 });
 
@@ -125,4 +125,16 @@ test("Verify redact function returns a dictionary with multiple PII snippets", (
 test("Verify redact function returns a dictionary with only the prompted type of PII", () => {
     var expected = "Hello world 1234567890 and my email is [REDACTED]";
     expect(helper.redactString("Hello world 1234567890 and my email is hello@world.com", ['EMAIL'])).toEqual(expected);
+});
+
+// Test: Verify that the Redact function can keep the last 4 digits of SSN in plaintext.
+test("Verify redact function returns a dictionary with only the prompted type of PII", () => {
+    var expected = "Hello world XXX-6789";
+    expect(helper.redactString("Hello world 123-45-6789", ['SSN'], keepLastDigits = true)).toEqual(expected);
+});
+
+// Test: Verify that the Redact function can keep the last 4 digits of phone in plaintext.
+test("Verify redact function returns a dictionary with only the prompted type of PII", () => {
+    var expected = "Hello world XXX-7890";
+    expect(helper.redactString("Hello world 123-456-7890", ['PHONE'], keepLastDigits = true)).toEqual(expected);
 });
