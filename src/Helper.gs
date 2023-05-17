@@ -4,6 +4,7 @@ const supportedRegex = {
     'EMAIL': new RegExp(/\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/gi),
     'DATE': new RegExp(/\b(0?[1-9]|1[0-2])[\/. ](0?[1-9]|[12]\d|3[01])[\/. ]((19|20)\d{2}|\d{2})/),
     'VIN': new RegExp(/\b([\S]){17}/),
+    'PASSPORT': new RegExp(/\W.\d{1,6}.|\d{9,10}/)
     'MAC_ADDR': new RegExp(/\b(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})/)
   }
   
