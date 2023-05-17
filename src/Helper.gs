@@ -3,7 +3,8 @@ const supportedRegex = {
     'PHONE': new RegExp(/\b(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})/),
     'EMAIL': new RegExp(/\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/gi),
     'DATE': new RegExp(/\b(0?[1-9]|1[0-2])[\/. ](0?[1-9]|[12]\d|3[01])[\/. ]((19|20)\d{2}|\d{2})/),
-    'VIN': new RegExp(/\b([\S]){17}/)
+    'VIN': new RegExp(/\b([\S]){17}/),
+    'MAC_ADDR': new RegExp(/\b(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})/)
   }
   
   function getTokenTypes(token) {
