@@ -109,10 +109,23 @@ test("Verify valid MAC address positive matches", () => {
     });
 });
 
+// Test: Verify that keywords are identified in data
+test("Verify that keywords are identified in data", () => {
+    const strings = [
+        "name address phone number social security number SSN date of birth email address passport license bank account credit card national identification tax identification medical record username password maiden name pin biometric ip mac coordinates employment history education history transactions"
+    ];
+    
+    strings.forEach(str => {
+        expect(helper.checkForKeywords(str).length).toEqual(25);
+    });
+});
+
+
 // Test: Verify that the list of supported types is up to date.
 test("Verify supported types are up to date", () => {
-    const expected = ['SSN', 'PHONE', 'EMAIL'];
+    const expected = ['SSN', 'PHONE', 'EMAIL', 'DATE', 'VIN', 'MAC_ADDR'];
     expect(helper.getSupportedTypes()).toEqual(expect.arrayContaining(expected));
+    expect(helper.getSupportedTypes().length).toEqual(expected.length);
 });
 
 // Test: Verify that the Redact function returns an empty string when given an empty string.
