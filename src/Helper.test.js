@@ -105,6 +105,21 @@ test("Verify valid Passport number", ()=>{
 
     valid_passport.forEach(passport => {
         expect(helper.getTokenTypes(passport)).toEqual(expect.arrayContaining(expected));
+      
+// Test: Verify that valid MAC addresses are detected correctly.
+test("Verify valid MAC address positive matches", () => {
+    const valid_mac = [
+        "4E-12-42-D2-58-CE",
+        "58:0D:32:E6:52:8D",
+        "12C5.8A53.8DA4",
+        "69-69-65-e4-14-e6",
+        "a4:6d:33:49:5b:c6",
+        "d566.0cbe.d6d4"
+    ];
+    const expected = ['MAC_ADDR'];
+    
+    valid_mac.forEach(mac => {
+        expect(helper.getTokenTypes(mac)).toEqual(expect.arrayContaining(expected));
     });
 });
 
