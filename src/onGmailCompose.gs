@@ -4,85 +4,100 @@
  * @return {CardService.Card} The card to show to the user.
  */
 function onGmailCompose(e) {
-    // Defining card elements  
-    var toField = CardService.newTextInput()
-      .setFieldName('toField')
-      .setValue('')
-      .setTitle('Recipient (To)');
-    
-    var subjectField = CardService.newTextInput()
-      .setFieldName('subjectField')
-      .setValue('')
-      .setTitle('Subject');
+  // Defining card elements  
+  var toField = CardService.newTextInput()
+    .setFieldName('toField')
+    .setValue('')
+    .setTitle('Recipient (To)');
   
-    var bodyField = CardService.newTextInput()
-      .setFieldName('bodyField')
-      .setValue('')
-      .setTitle('Email Body');
-  
-    var submitAction = CardService.newAction()
-      .setFunctionName('composeSafeEmail');
-  
-    var submitButton = CardService.newTextButton()
-      .setText('Compose SafeSend Email')
-      .setOnClickAction(submitAction)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
-  
-    var emailInputSection = CardService.newCardSection()
-      .addWidget(toField)
-      .addWidget(subjectField)
-      .addWidget(bodyField)
-      .addWidget(submitButton);
-  
-    var cardHeader = CardService.newCardHeader()
-      .setTitle('Compose a SafeSend Email')
-      .setSubtitle('Enter your email details and let SafeSend securely redact sensitive content.');
-  
-    // -----
-    // SPACE FOR OPTION SECTION
-    // -----
-  
-    var card = CardService.newCardBuilder()
-      .setHeader(cardHeader)
-      .addSection(emailInputSection);
-  
-    return card.build();
+  var subjectField = CardService.newTextInput()
+    .setFieldName('subjectField')
+    .setValue('')
+    .setTitle('Subject');
+
+  var bodyField = CardService.newTextInput()
+    .setFieldName('bodyField')
+    .setValue('')
+    .setTitle('Email Body');
+
+  var submitAction = CardService.newAction()
+    .setFunctionName('composeSafeEmail');
+
+  var submitButton = CardService.newTextButton()
+    .setText('Compose SafeSend Email')
+    .setOnClickAction(submitAction)
+    .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+  var emailInputSection = CardService.newCardSection()
+    .addWidget(toField)
+    .addWidget(subjectField)
+    .addWidget(bodyField)
+    .addWidget(submitButton);
+
+  var cardHeader = CardService.newCardHeader()
+    .setTitle('Compose a SafeSend Email')
+    .setSubtitle('Enter your email details and let SafeSend securely redact sensitive content.');
+
+  // -----
+  // SPACE FOR OPTION SECTION
+  // -----
+
+  var card = CardService.newCardBuilder()
+    .setHeader(cardHeader)
+    .addSection(emailInputSection);
+
+  return card.build();
+}
+
+/**
+ * Callback for redacting an email text.
+ * @param {Object} e The event object.
+ * @return {CardService.UpdateDraftActionResponse} The draft update response.
+ */
+function composeSafeEmail(e) {
+  // Collect user fields
+  var toField = e.formInputs.toField;
+  var subjectField = e.formInputs.subjectField;
+  var bodyField = e.formInputs.bodyField;
+
+  // Ensure all fields are filled out
+  if(e.formInputs.toField == undefined || 
+      e.formInputs.subjectField == undefined ||
+      e.formInputs.bodyField == undefined)
+  {
+    return null;
   }
+
+  var user = PropertiesService.getUserProperties()
+  var userSettings = user.getProperties();
+  const userOverride = JSON.parse(userSettings.override);
+  const userSensitivity = JSON.parse(userSettings.sensitivity);
+  var toRedact = [];
+
+  if(userSensitivity.includes('lowRiskSelect'))
+    toRedact.push(...getLowRisk());
+  if(userSensitivity.includes('medRiskSelect'))
+    toRedact.push(...getMedRisk());
+  if(userSensitivity.includes('highRiskSelect'))
+    toRedact.push(...getHighRisk());
   
-  /**
-   * Callback for redacting an email text.
-   * @param {Object} e The event object.
-   * @return {CardService.UpdateDraftActionResponse} The draft update response.
-   */
-  function composeSafeEmail(e) {
-    // Collect user fields
-    var toField = e.formInputs.toField;
-    var subjectField = e.formInputs.subjectField;
-    var bodyField = e.formInputs.bodyField;
-  
-    // Ensure all fields are filled out
-    if(e.formInputs.toField == undefined || 
-        e.formInputs.subjectField == undefined ||
-        e. formInputs.bodyField == undefined)
-    {
-      return null;
-    }
-  
-    // Redact personal identifiable information
-    subjectField = redactString(subjectField);
-    bodyField = redactString(bodyField);
-  
-    // Create updated draft content
-    // Needs a catch block if all fields aren't filled out
-    var response = CardService.newUpdateDraftActionResponseBuilder()
-    .setUpdateDraftToRecipientsAction(CardService.newUpdateDraftToRecipientsAction()
-      .addUpdateToRecipients(toField))
-    .setUpdateDraftSubjectAction(CardService.newUpdateDraftSubjectAction()
-      .addUpdateSubject(subjectField))
-    .setUpdateDraftBodyAction(CardService.newUpdateDraftBodyAction()
-      .addUpdateContent(bodyField,CardService.ContentType.MUTABLE_HTML)
-      .setUpdateType(CardService.UpdateDraftBodyType.INSERT_AT_START))
-    .build();
-  
-    return response;
-  }
+  toRedact.push(...userOverride);
+
+  // Redact personal identifiable information
+  subjectField = redactString(subjectField, toRedact);
+  bodyField = redactString(bodyField, toRedact);
+
+  // Create updated draft content
+  // Needs a catch block if all fields aren't filled out
+  var response = CardService.newUpdateDraftActionResponseBuilder()
+  .setUpdateDraftToRecipientsAction(CardService.newUpdateDraftToRecipientsAction()
+    .addUpdateToRecipients(toField))
+  .setUpdateDraftSubjectAction(CardService.newUpdateDraftSubjectAction()
+    .addUpdateSubject(subjectField))
+  .setUpdateDraftBodyAction(CardService.newUpdateDraftBodyAction()
+    .addUpdateContent(bodyField,CardService.ContentType.MUTABLE_HTML)
+    .setUpdateType(CardService.UpdateDraftBodyType.INSERT_AT_START))
+  .build();
+
+  return response;
+}
