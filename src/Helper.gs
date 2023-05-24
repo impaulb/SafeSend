@@ -8,6 +8,21 @@ const supportedRegex = {
   'MAC_ADDR': new RegExp(/\b(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})/)
 }
 
+function getLowRisk()
+{
+  return ['EMAIL', 'DATE'];
+}
+
+function getMedRisk()
+{
+  return ['MAC_ADDR', 'VIN', 'PHONE'];
+}
+
+function getHighRisk()
+{
+  return ['SSN', 'PASSPORT'];
+}
+
 const keywords = [
   "name",
   "address",
@@ -140,10 +155,10 @@ function checkForKeywords(data){
 }
 
 // Needed for testing, doesn't work in Google Scripts
-module.exports = {
-  getTokenTypes,
-  getSupportedTypes,
-  isTokenPii,
-  redactString,
-  checkForKeywords
-}
+// module.exports = {
+//   getTokenTypes,
+//   getSupportedTypes,
+//   isTokenPii,
+//   redactString,
+//   checkForKeywords
+// }
