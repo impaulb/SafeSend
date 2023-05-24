@@ -38,10 +38,6 @@ function onGmailCompose(e) {
     .setTitle('Compose a SafeSend Email')
     .setSubtitle('Enter your email details and let SafeSend securely redact sensitive content.');
 
-  // -----
-  // SPACE FOR OPTION SECTION
-  // -----
-
   var card = CardService.newCardBuilder()
     .setHeader(cardHeader)
     .addSection(emailInputSection);
@@ -72,6 +68,7 @@ function composeSafeEmail(e) {
   var userSettings = user.getProperties();
   const userOverride = JSON.parse(userSettings.override);
   const userSensitivity = JSON.parse(userSettings.sensitivity);
+  const keepDigits = userSettings.keepDigits === "true" ? true : false;
   var toRedact = [];
 
   if(userSensitivity.includes('lowRiskSelect'))
@@ -84,8 +81,8 @@ function composeSafeEmail(e) {
   toRedact.push(...userOverride);
 
   // Redact personal identifiable information
-  subjectField = redactString(subjectField, toRedact);
-  bodyField = redactString(bodyField, toRedact);
+  subjectField = redactString(subjectField, toRedact, keepDigits);
+  bodyField = redactString(bodyField, toRedact, keepDigits);
 
   // Create updated draft content
   // Needs a catch block if all fields aren't filled out
