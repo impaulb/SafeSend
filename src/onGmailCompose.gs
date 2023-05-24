@@ -66,6 +66,17 @@ function composeSafeEmail(e) {
 
   var user = PropertiesService.getUserProperties()
   var userSettings = user.getProperties();
+
+  // User logging in the first time
+  if(userSettings.override === undefined)
+    userSettings.override = JSON.stringify([]);
+  
+  if(userSettings.sensitivity === undefined)
+    userSettings.sensitivity = JSON.stringify([]);
+
+  if(userSettings.keepDigits === undefined)
+    userSettings.keepDigits = JSON.stringify(false);
+  
   const userOverride = JSON.parse(userSettings.override);
   const userSensitivity = JSON.parse(userSettings.sensitivity);
   const keepDigits = userSettings.keepDigits === "true" ? true : false;
