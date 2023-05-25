@@ -154,11 +154,47 @@ function checkForKeywords(data){
   return warning_summary;
 }
 
-// Needed for testing, doesn't work in Google Scripts
-// module.exports = {
-//   getTokenTypes,
-//   getSupportedTypes,
-//   isTokenPii,
-//   redactString,
-//   checkForKeywords
-// }
+function warnString(data, subjectLine, target = []){
+  /*
+  * appends a warning on to the end of the email body / subject field
+  * includes warnings if keywords are found
+  * @param data (str) input data to be checked
+  * @param subjectLine (str) subject (more input data to be checked)
+  * @param target (list, optional) defaults to all PII, list of PIIs to be checked for
+  * returns (str) with original message plus a warning appended on to the end
+  */
+
+  data = subjectLine + ' ' + data;
+  data = data + '';
+  const split_data = data.split(' ');
+  const detected_PII = []
+
+  for(const token of split_data)
+    if(isTokenPii(token)){
+      var tokenTypes = getTokenTypes(token);
+      if(shouldRedact(tokenTypes, target))
+        detected_PII.push(token);
+    }
+  
+  //if no PII was found within targets, don't need to do anything
+  if(detected_PII === undefined || detected_PII.length == 0)
+    return data;
+
+  //otherwise, append a warning listing all found PII
+  let warning = "\nCheck for the following information that was detected: ";
+  for(const piis of detected_PII)
+    warning = warning + piis + ' ';
+  data += warning;
+  return data;  
+}
+
+
+//Needed for testing, doesn't work in Google Scripts
+module.exports = {
+   getTokenTypes,
+   getSupportedTypes,
+   isTokenPii,
+   redactString,
+   checkForKeywords,
+   warnString
+}

@@ -336,3 +336,15 @@ test("Verify keyword match after redaction", () => {
     expect(actual_redact).toEqual(expected_redact);
     expect(actual_kw).toEqual(actual_kw);
 });
+
+// Test: verify warnString with both subject and body
+test("Verify warnString works as expected", () => {
+    //arrange
+    const body = "Hello, my name is Luke. My phone number is 425-555-5555";
+    const subject = "SSN: 444-44-4444"
+    const expectedWarn = subject + ' ' + body + "\nCheck for the following information that was detected: " + "444-44-4444 " + "425-555-5555 ";
+    //act
+    const actualWarn = helper.warnString(body, subject);
+    //assert
+    expect(actualWarn).toEqual(expectedWarn);
+});
