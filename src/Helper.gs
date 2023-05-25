@@ -164,9 +164,10 @@ function warnString(data, subjectLine, target = []){
   * returns (str) with original message plus a warning appended on to the end
   */
 
-  data = subjectLine + ' ' + data;
+  let tempData = subjectLine + ' ' + data;
+  tempData = tempData + '';
   data = data + '';
-  const split_data = data.split(' ');
+  const split_data = tempData.split(' ');
   const detected_PII = []
 
   for(const token of split_data)
@@ -185,7 +186,7 @@ function warnString(data, subjectLine, target = []){
   for(const piis of detected_PII)
     warning = warning + piis + ' ';
   data += warning;
-  return data;  
+  return data;
 }
 
 
