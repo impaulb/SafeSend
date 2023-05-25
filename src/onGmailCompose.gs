@@ -80,6 +80,7 @@ function composeSafeEmail(e) {
   const userOverride = JSON.parse(userSettings.override);
   const userSensitivity = JSON.parse(userSettings.sensitivity);
   const keepDigits = userSettings.keepDigits === "true" ? true : false;
+  const doWarn = userSettings.doWarn === "true" ? true : false;
   var toRedact = [];
 
   if(userSensitivity.includes('lowRiskSelect'))
@@ -91,10 +92,14 @@ function composeSafeEmail(e) {
   
   toRedact.push(...userOverride);
 
-  // Redact personal identifiable information
-  subjectField = redactString(subjectField, toRedact, keepDigits);
-  bodyField = redactString(bodyField, toRedact, keepDigits);
-
+  // Redact or Warn about personally identifiable information
+  if(doWarn){
+    subjectField = warnString(subjectField, toRedact);
+    bodyField = warnString(bodyField, toRedact);
+  } else {
+    subjectField = redactString(subjectField, toRedact, keepDigits);
+    bodyField = redactString(bodyField, toRedact, keepDigits);
+  }
   // Create updated draft content
   // Needs a catch block if all fields aren't filled out
   var response = CardService.newUpdateDraftActionResponseBuilder()
