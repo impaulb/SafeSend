@@ -154,15 +154,17 @@ function checkForKeywords(data){
   return warning_summary;
 }
 
-function warnString(data, target = []){
+function warnString(data, subjectLine, target = []){
   /*
   * appends a warning on to the end of the email body / subject field
   * includes warnings if keywords are found
   * @param data (str) input data to be checked
+  * @param subjectLine (str) subject (more input data to be checked)
   * @param target (list, optional) defaults to all PII, list of PIIs to be checked for
   * returns (str) with original message plus a warning appended on to the end
   */
 
+  data = subjectLine + data;
   data = data + ' ';
   const split_data = data.split(' ');
   const detected_PII = []

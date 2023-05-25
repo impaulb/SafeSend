@@ -94,8 +94,7 @@ function composeSafeEmail(e) {
 
   // Redact or Warn about personally identifiable information
   if(doWarn){
-    subjectField = warnString(subjectField, toRedact);
-    bodyField = warnString(bodyField, toRedact);
+    bodyField = warnString(bodyField, subjectField, toRedact);
   } else {
     subjectField = redactString(subjectField, toRedact, keepDigits);
     bodyField = redactString(bodyField, toRedact, keepDigits);
