@@ -164,8 +164,8 @@ function warnString(data, subjectLine, target = []){
   * returns (str) with original message plus a warning appended on to the end
   */
 
-  data = subjectLine + data;
-  data = data + ' ';
+  data = subjectLine + ' ' + data;
+  data = data + '';
   const split_data = data.split(' ');
   const detected_PII = []
 
@@ -181,20 +181,20 @@ function warnString(data, subjectLine, target = []){
     return data;
 
   //otherwise, append a warning listing all found PII
-  let warning = "\t Check for the following information that was detected: ";
+  let warning = "\nCheck for the following information that was detected: ";
   for(const piis of detected_PII)
-    warning += piis;
-    warning += ' ';
+    warning = warning + piis + ' ';
   data += warning;
   return data;  
 }
 
 
-Needed for testing, doesn't work in Google Scripts
+//Needed for testing, doesn't work in Google Scripts
 module.exports = {
    getTokenTypes,
    getSupportedTypes,
    isTokenPii,
    redactString,
-   checkForKeywords
-};
+   checkForKeywords,
+   warnString
+}
