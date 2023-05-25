@@ -190,11 +190,11 @@ function warnString(data, subjectLine, target = []){
 }
 
 
-// Needed for testing, doesn't work in Google Scripts
-// module.exports = {
-//   getTokenTypes,
-//   getSupportedTypes,
-//   isTokenPii,
-//   redactString,
-//   checkForKeywords
-// }
+Needed for testing, doesn't work in Google Scripts
+module.exports = {
+   getTokenTypes,
+   getSupportedTypes,
+   isTokenPii,
+   redactString,
+   checkForKeywords
+};

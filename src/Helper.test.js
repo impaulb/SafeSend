@@ -344,7 +344,7 @@ test("Verify warnString works as expected", () => {
     const subject = "SSN: 444-44-4444"
     const expectedWarn = subject + body + "\t Check for the following information that was detected: " + "444-44-4444" + "425-555-5555";
     //act
-    const actualWarn = warnString(body, subject);
+    const actualWarn = helper.warnString(body, subject);
     //assert
     expect(expectedWarn).toEqual(actualWarn);
 });
