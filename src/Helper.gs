@@ -1,6 +1,6 @@
 const supportedRegex = {
   'SSN': new RegExp(/\b([0-9]{9})|([0-9]{3}[-,\s][0-9]{6})|([0-9]{5}[-,\s][0-9]{4})|([0-9]{3}[-,\s][0-9]{2}[-,\s][0-9]{4})|([0-9]{2}[-,\s][0-9]{7})/),
-  'PHONE': new RegExp(/\b(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})/),
+  'PHONE': new RegExp(/\b(?:\d{1}\s)?\(?(\d{3})\)?-?\s?(\d{3})-?\s?(\d{4})\b/),
   'EMAIL': new RegExp(/\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/gi),
   'DATE': new RegExp(/\b(0?[1-9]|1[0-2])[\/. ](0?[1-9]|[12]\d|3[01])[\/. ]((19|20)\d{2}|\d{2})/),
   'VIN': new RegExp(/\b([\S]){17}/),
@@ -155,10 +155,10 @@ function checkForKeywords(data){
 }
 
 // Needed for testing, doesn't work in Google Scripts
-// module.exports = {
-//   getTokenTypes,
-//   getSupportedTypes,
-//   isTokenPii,
-//   redactString,
-//   checkForKeywords
-// }
+module.exports = {
+  getTokenTypes,
+  getSupportedTypes,
+  isTokenPii,
+  redactString,
+  checkForKeywords
+}
