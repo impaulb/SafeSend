@@ -334,17 +334,53 @@ test("Verify keyword match after redaction", () => {
 
     // Assert
     expect(actual_redact).toEqual(expected_redact);
-    expect(actual_kw).toEqual(actual_kw);
+    expect(actual_kw).toEqual(expected_kw);
 });
 
-// Test: verify warnString with both subject and body
-test("Verify warnString works as expected", () => {
-    //arrange
-    const body = "Hello, my name is Luke. My phone number is 425-555-5555";
-    const subject = "SSN: 444-44-4444";
-    const expectedWarn = body + "\nCheck for the following information that was detected: " + "444-44-4444 " + "425-555-5555 ";
-    //act
-    const actualWarn = helper.warnString(body, subject);
-    //assert
-    expect(actualWarn).toEqual(expectedWarn);
+// Test: Verify false VIN numbers fail (missing digit)
+test("Verify false VIN numbers fail", () => {
+    // Arrange
+    const request = "Hello there, my VIN is KNAFT4A22D567589";
+    const expected_kw = [];
+    const expected_redact = "Hello there, my VIN is KNAFT4A22D567589"
+    
+    // Act
+    const actual_redact = helper.redactString(request);
+    const actual_kw = helper.checkForKeywords(actual_redact);
+
+    // Assert
+    expect(actual_kw).toEqual(expected_kw);
+    expect(actual_redact).toEqual(expected_redact);
+});
+
+// Test: Verify false emails fail (extra @)
+test("Verify false emails fail", () => {
+    // Arrange
+    const request = "Hello there, my email is hello@@scu.edu";
+    const expected_kw = [];
+    const expected_redact = "Hello there, my email is hello@@scu.edu"
+    
+    // Act
+    const actual_redact = helper.redactString(request);
+    const actual_kw = helper.checkForKeywords(actual_redact);
+
+    // Assert
+    expect(actual_kw).toEqual(expected_kw);
+    expect(actual_redact).toEqual(expected_redact);
+});
+
+// Test: Verify false date fail (poor formatting)
+test("Verify false date fail", () => {
+    // Arrange
+    const request = "Hello there, my date is 01/ 20. 1/1";
+    const expected_kw = [];
+    const expected_redact = "Hello there, my date is 01/ 20. 1/1"
+    
+    // Act
+    const actual_redact = helper.redactString(request);
+    const actual_kw = helper.checkForKeywords(actual_redact);
+
+    // Assert
+    expect(actual_kw).toEqual(expected_kw);
+    expect(actual_redact).toEqual(expected_redact);
 });
